@@ -1,5 +1,5 @@
 var http = require('http'),
-	mysql      = require('mysql');
+	mysql  = require('mysql');
 
 var pword = null;
 
@@ -24,13 +24,33 @@ var connection = mysql.createConnection({
 connection.connect();
 
 function load_players(callback) {
-	connection.query('SELECT * from players order by lastname',
+	connection.query('SELECT id, lastname, firstname from players order by lastname',
 		function(err, rows, fields) {
 	  if (!err) {
 	  	callback(null, rows);
 	  } else
 	    callback(err);
 	});
+}
+
+function load_player(player_name, callback) {
+	if (isNaN(player_name)) {
+		connection.query("SELECT * from players where lower(lastname) = lower('" + player_name + "') order by lastname",
+		function(err, rows, fields) {
+		  if (!err) {
+		  	callback(null, rows);
+		  } else
+		    callback(err);
+		});
+	} else {
+		connection.query("SELECT * from players where id = " + player_name + " order by lastname",
+		function(err, rows, fields) {
+		  if (!err) {
+		  	callback(null, rows);
+		  } else
+		    callback(err);
+		});
+	}
 }
 
 function load_active_players(callback) {
@@ -94,6 +114,18 @@ function handle_players(req, res) {
 	});
 }
 
+function handle_player(req, res) {
+	var player = req.url.substr(9);
+	load_player(player, (err, players) => {
+		if (err) {
+			send_failure(res, 500, err);
+			return;
+		}
+
+		send_success(res, players);
+	});
+}
+
 function handle_active_players(req, res) {
 	load_active_players((err, players) => {
 		if (err) {
@@ -120,6 +152,8 @@ function handle_incoming_request(req, res) {
 	console.log("Incoming request: " + req.method + " " + req.url);
 	if (req.url == "/players") {
 		handle_players(req, res);
+	} else if (req.url.substr(0, 9) == '/players/' && req.url.length > 9) {
+		handle_player(req, res);
 	} else if (req.url == "/active") {
 		handle_active_players(req, res);
 	} else if (req.url == "/monitors") {
