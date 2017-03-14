@@ -17,9 +17,11 @@ var connection = mysql.createConnection({
 
 connection.connect();
 
-connection.query('SELECT * from players', function(err, rows, fields) {
+var name = 'Wiegand';
+connection.query("update players set onleave = 1 where lower(lastname) = ?", [name.toLowerCase()], function(err, result) {
+  console.log("done");
   if (!err) {
-  	console.log('The solution is: ', rows);
+  	console.log('The solution is: ', result);
   } else
     console.log('Error while performing Query.');
 });

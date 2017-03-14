@@ -148,8 +148,32 @@ function handle_monitor_players(req, res) {
 	});
 }
 
-function handle_incoming_request(req, res) {
-	console.log("Incoming request: " + req.method + " " + req.url);
+function update_onleave(name, callback) {
+	console.log(`updating onleave, name = ${name}`);
+	connection.query("update players set onleave = 1 where lower(lastname) = ?", [name.toLowerCase()]),
+	function(err, result) {
+		console.log("done");
+	if (!err) {
+		console.log("no error");
+		callback(null, result);
+	} else
+  	console.log("error");
+		callback(err);
+	}
+}
+
+function handle_player_onleave(name, req, res) {
+	update_onleave(name, (err, result) => {
+		if (err) {
+			send_failure(res, 500, err);
+			return;
+		}
+
+		send_success(res, result);
+	});
+}
+
+function handle_get_request(req, res) {
 	if (req.url == "/players") {
 		handle_players(req, res);
 	} else if (req.url.substr(0, 9) == '/players/' && req.url.length > 9) {
@@ -158,6 +182,25 @@ function handle_incoming_request(req, res) {
 		handle_active_players(req, res);
 	} else if (req.url == "/monitors") {
 		handle_monitor_players(req, res);
+	} else {
+		send_failure(res, 404, invalid_resource());
+	}
+}
+
+function handle_post_request(req, res) {
+	if (req.url.toLowerCase().startsWith('/players/') && req.url.toLowerCase().endsWith("/on-leave")) {
+		var pos = req.url.toLowerCase().indexOf("/on-leave");
+		var pname = req.url.substr(9, pos - 9);
+		handle_player_onleave(pname);
+	}
+}
+
+function handle_incoming_request(req, res) {
+	console.log("Incoming request: " + req.method + " " + req.url);
+	if (req.method.toLowerCase() == 'get') {
+		handle_get_request(req, res);
+	} else if (req.method.toLowerCase() == 'post') {
+		handle_post_request(req, res);
 	} else {
 		send_failure(res, 404, invalid_resource());
 	}
