@@ -1,5 +1,4 @@
-var http = require('http'),
-	mysql  = require('mysql');
+var http = require('http');
 
 var pword = null;
 
