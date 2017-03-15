@@ -149,15 +149,15 @@ function handle_monitor_players(req, res) {
 
 function update_onleave(name, callback) {
 	console.log(`updating onleave, name = ${name}`);
-	connection.query("update players set onleave = 1 where lower(lastname) = ?", [name.toLowerCase()]),
+	connection.query("update players set onleave = 1 where id = ?", [name]),
 	function(err, result) {
 		console.log("done");
 	if (!err) {
 		console.log("no error");
 		callback(null, result);
 	} else
-  	console.log("error");
-		callback(err);
+  		console.log("error");
+		callback(err, result);
 	}
 }
 
