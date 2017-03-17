@@ -1,4 +1,10 @@
-var http = require('http');
+var express = require('express');
+var app = express();
+
+var mysql = require('mysql'),
+	url = require('url'),
+	path = require('path'),
+	fs = require('fs');
 
 var pword = null;
 
@@ -23,7 +29,7 @@ var connection = mysql.createConnection({
 connection.connect();
 
 function load_players(callback) {
-	connection.query('SELECT id, lastname, firstname from players order by lastname',
+	connection.query('SELECT id, lastname, firstname, turn, onleave from players order by lastname',
 		function(err, rows, fields) {
 	  if (!err) {
 	  	callback(null, rows);
@@ -109,7 +115,7 @@ function handle_players(req, res) {
 			return;
 		}
 
-		send_success(res, players);
+		send_success(res, {players: players});
 	});
 }
 
@@ -172,14 +178,69 @@ function handle_player_onleave(name, req, res) {
 	});
 }
 
-function handle_get_request(req, res) {
-	if (req.url == "/players") {
+function serve_page(req, res) {
+	var page = get_page_name(req);
+
+	fs.readFile('basic.html', (err, contents) => {
+		if (err) {
+			send_failure(res, 500, err);
+			return;
+		}
+
+		contents = contents.toString('utf8');
+
+		contents = contents.replace('{{PAGE_NAME}}', page);
+		res.writeHead(200, { "Content-Type" : "text/html" });
+		res.end(contents);
+
+	});
+}
+
+function get_page_name(req) {
+	return req.params.page_name;
+}
+
+function serve_static_file(file, res) {
+	var rs = fs.createReadStream(file);
+
+	console.log('serving ' + file);
+	rs.on('error', function(e) {
+		send_failure(res, 404, invalid_resource());
+		return;
+	});
+
+	var ct = content_type_for_path(file);
+	res.writeHead(200, { "Content-Type": ct });
+	rs.pipe(res);
+	console.log('done');
+}
+
+function content_type_for_path(file) {
+	var ext = path.extname(file);
+	switch (ext.toLowerCase()) {
+		case '.html': return "text/html";
+		case '.js': return 'text/javascript';
+		case '.css': return 'text/css';
+		case '.jpg': case '.jpeg': return 'image/jpeg';
+	}
+	return "text/plain";
+}
+
+/*function handle_get_request(req, res) {
+	req.parsed_url = url.parse(req.url, true);
+	var core_url = req.parsed_url.pathname;
+
+	if (core_url.substring(0, 9) == '/content/' || core_url.substring(0, 11) == '/templates/') {
+		serve_static_file(req.url.substring(1), res);
+	} else if (core_url.substr(0, 7) == '/pages/') {
+		serve_page(req, res);
+	} else if (core_url == "/players") {
 		handle_players(req, res);
-	} else if (req.url.substr(0, 9) == '/players/' && req.url.length > 9) {
+	} else if (core_url.substr(0, 9) == '/players/' && core_url.length > 9) {
 		handle_player(req, res);
-	} else if (req.url == "/active") {
+	} else if (core_url == "/active") {
 		handle_active_players(req, res);
-	} else if (req.url == "/monitors") {
+	} else if (core_url == "/monitors") {
 		handle_monitor_players(req, res);
 	} else {
 		send_failure(res, 404, invalid_resource());
@@ -203,7 +264,24 @@ function handle_incoming_request(req, res) {
 	} else {
 		send_failure(res, 404, invalid_resource());
 	}
+}*/
+
+function four_oh_four(req, res) {
+	send_failure(res, 404, invalid_resource());
 }
 
-var s = http.createServer(handle_incoming_request);
-s.listen(8080);
+app.get('/players', handle_players);
+app.get('/players/:player', handle_player);
+app.get('/active', handle_active_players);
+app.get('/monitors', handle_monitor_players);
+
+app.get('/pages/:page_name', serve_page);
+app.get('/content/:filename', function(req, res) {
+	serve_static_file('content/' + req.params.filename, res);
+});
+app.get('/templates/:filename', function(req, res) {
+	serve_static_file('content/' + req.params.filename, res);
+});
+app.get('*', four_oh_four);
+
+app.listen(8080);

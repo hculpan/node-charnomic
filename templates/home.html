@@ -1,0 +1,12 @@
+<div id="player_list">
+	<p>There are {{ players.length }} players</p>
+	<ul id="players">
+		{{#players}}
+			<li class="player">{{lastname}}, {{firstname}} [id: {{id}}]</li>
+		{{/players}}
+		{{^players}}
+			<li>Sorry, no players</li>
+		{{/players}}
+	</ul>
+	<a href="/pages/"
+</div>
