@@ -2,7 +2,7 @@ use charnomic;
 
 DELIMITER $$
 
-create procedure create_players() 
+create procedure create_players()
 begin
     drop table if exists players;
 
@@ -14,14 +14,17 @@ begin
         joined DATETIME DEFAULT CURRENT_TIMESTAMP,
         turn BOOLEAN DEFAULT 0,
         onleave BOOLEAN DEFAULT 0,
+        active BOOLEAN DEFAULT 1,
         points INT DEFAULT 0,
+        level INT DEFAULT 1,
+        gold INT DEFAULT 0,
         leftgame DATETIME NULL,
         monitor BOOLEAN DEFAULT 0
     );
 
     insert into players (lastname, firstname, points, onleave) values ('Boivin', 'Bill', 0, 1);
     insert into players (lastname, firstname, points, monitor) values ('Culpan', 'Harry', 8, 1);
-    insert into players (lastname, firstname, points) values ('Duignan', 'Chris', 7);
+    insert into players (lastname, firstname, points, onleave) values ('Duignan', 'Chris', 7, 1);
     insert into players (lastname, firstname, points) values ('Koehler', 'Steve', 10);
     insert into players (lastname, firstname, points) values ('Mele', 'Al', 4);
     insert into players (lastname, firstname, points) values ('Thomason', 'Mike', 0);
@@ -38,4 +41,3 @@ call create_players();
 
 -- Drop the procedure
 drop procedure create_players;
-

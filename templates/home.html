@@ -1,12 +1,44 @@
-<div id="player_list">
-	<p>There are {{ players.length }} players</p>
-	<ul id="players">
-		{{#players}}
-			<li class="player">{{lastname}}, {{firstname}} [id: {{id}}]</li>
-		{{/players}}
-		{{^players}}
-			<li>Sorry, no players</li>
-		{{/players}}
-	</ul>
-	<a href="/pages/"
+<div class="wrapper">
+	<div id="leftcol">
+		<h3 class="center-text">Players</h3>
+		<table>
+			<tr>
+				<th class="center-text"></th>
+				<th width="60%" class="center-text">Name</th>
+				<th class="center-text">Pts</th>
+				<th class="center-text">Lvl</th>
+				<th class="center-text">GP</th>
+			</tr>
+		{{#each players}}
+			<tr>
+				<td class="center-text{{#if onleave}} on-leave{{/if}}">
+					{{#if onleave}}<img src="/content/vacation-icon.png"/>{{/if}}
+					{{#if turn}}<img src="/content/chkmark.png"/>{{/if}}
+				</td>
+				<td width="60%" class="center-text{{#if onleave}} on-leave{{/if}}">{{player_name lastname firstname}}</td>
+				<td class="center-text{{#if onleave}} on-leave{{/if}}">{{points}}</td>
+				<td class="center-text{{#if onleave}} on-leave{{/if}}">{{level}}</td>
+				<td class="center-text{{#if onleave}} on-leave{{/if}}">{{gold}}</td>
+			</tr>
+		{{/each}}
+		</table>
+	</div>
+
+	<div id="middlecol">
+		<h2 class="center-text">Rules</h2>
+		{{#each rules}}
+		<div class="rule">
+			{{#if name}}
+			<div>
+				{{num}} - {{name}}<br>
+				{{rule}}
+			</div>
+			{{else}}
+			<div>
+				{{num}} - {{rule}}
+			</div>
+			{{/if}}
+		</div>
+		{{/each}}
+	</div>
 </div>
