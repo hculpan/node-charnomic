@@ -18,17 +18,18 @@ begin
         points INT DEFAULT 0,
         level INT DEFAULT 1,
         gold INT DEFAULT 0,
+        vetoes INT DEFAULT 3,
         leftgame DATETIME NULL,
         monitor BOOLEAN DEFAULT 0
     );
 
-    insert into players (lastname, firstname, points, onleave) values ('Boivin', 'Bill', 0, 1);
-    insert into players (lastname, firstname, points, monitor) values ('Culpan', 'Harry', 8, 1);
-    insert into players (lastname, firstname, points, onleave) values ('Duignan', 'Chris', 7, 1);
-    insert into players (lastname, firstname, points) values ('Koehler', 'Steve', 10);
-    insert into players (lastname, firstname, points) values ('Mele', 'Al', 4);
-    insert into players (lastname, firstname, points) values ('Thomason', 'Mike', 0);
-    insert into players (lastname, firstname, points) values ('Wiegand', 'Paul', 0);
+    insert into players (lastname, firstname, points, onleave) values ('Boivin', 'Bill', 10, 1);
+    insert into players (lastname, firstname, points, monitor) values ('Culpan', 'Harry', 18, 1);
+    insert into players (lastname, firstname, points, onleave) values ('Duignan', 'Chris', 17, 1);
+    insert into players (lastname, firstname, points, onleave) values ('Koehler', 'Steve', 20, 1);
+    insert into players (lastname, firstname, points) values ('Mele', 'Al', 19);
+    insert into players (lastname, firstname, points, turn) values ('Thomason', 'Mike', 19, 1);
+    insert into players (lastname, firstname, points) values ('Wiegand', 'Paul', 19);
 
     commit;
 

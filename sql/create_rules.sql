@@ -1,5 +1,7 @@
 use charnomic;
 
+source sql/create_proposals.sql;
+
 DELIMITER $$
 
 create procedure create_rules()
@@ -11,14 +13,10 @@ begin
         rule TEXT,
         name VARCHAR(255),
         num INT,
-        proposedby INT,
-        proposeddate DATETIME,
-        voteopend DATETIME,
-        voteclosed DATETIME,
-        status varchar(10),
+        proposalid INT,
 
-        FOREIGN KEY (proposedby)
-              REFERENCES players(id)
+        FOREIGN KEY (proposalid)
+              REFERENCES proposals(id)
               ON UPDATE CASCADE ON DELETE RESTRICT
     );
 
@@ -96,16 +94,16 @@ begin
         be maintained in a location that all the players may access freely.
         The GM is Harry Culpan.', null, 11);
 
-    insert into rules (rule, name, num)
+    insert into rules (rule, name, num, proposalid)
       values ('A player may take temporary leave of the game by notifying the
         other players that they will not be playing and the dates of their
         leave. During this period, they will automatically, voluntarily pass
         their turn pursuant to Rule 3 as soon as their turn commences and
         Abstain from all voting. The Player on Leave may not vote or make
         proposals while on Leave. The Player on Leave may rejoin the game
-        early by notifying the other players and then resuming play.', 'Player on Leave', 13);
+        early by notifying the other players and then resuming play.', 'Player on Leave', 13, 2);
 
-    insert into rules (rule, name, num)
+    insert into rules (rule, name, num, proposalid)
       values ('No Proposal may be enacted which directly, specifically and
         negatively affect any player or players currently on Leave as that
         term is defined in Rule 13. A proposal "directly, specifically and
@@ -114,11 +112,13 @@ begin
         will effect the player such that he would definitely have voted "No" to
         the proposal had he not been on Leave, and (b) the proposal effects any
         players then on Leave more than those not on Leave.', 'The "No
-        Targeting of Players on Leave" Act', 14);
+        Targeting of Players on Leave" Act', 14, 3);
 
-    insert into rules (rule, name, num)
-      values ('Each player is given a level starting at level 1. Each player
-        will be given an initial account balance of 0 gold pieces.', null, 16);
+    insert into rules (rule, name, num, proposalid)
+      values ('<ol type="a">
+          <li>Each player is given a level starting at level 1.</li>
+          <li>Each player will be given an initial account balance of 0 gold pieces.</li>
+        </ol>', null, 16, 5);
 
     commit;
 
